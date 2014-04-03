@@ -19,19 +19,20 @@ class Stasevi4_Autoupsell_Block_Crosssell extends Mage_Checkout_Block_Cart_Cross
 					$limit = $this->_maxItemCount;
 				}
 							
-				$ninProductIds =	 Mage::getResourceModel('reports/product_collection')
-													->addAttributeToFilter('visibility', array(
-														Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH,
-														Mage_Catalog_Model_Product_Visibility::VISIBILITY_IN_CATALOG
-													))
-													->addAttributeToFilter('status', 1)
-													->addAttributeToSelect('*')
-													->addStoreFilter()
-													->addUrlRewrite()										
-													->setPageSize($limit);
+				$ninProductIds = Mage::getResourceModel('reports/product_collection')
+						->addAttributeToFilter('visibility', array(
+									Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH,
+									Mage_Catalog_Model_Product_Visibility::VISIBILITY_IN_CATALOG
+						))
+						->addAttributeToFilter('status', 1)
+						->addAttributeToSelect('*')
+						->addStoreFilter()
+						->addUrlRewrite()										
+						->setPageSize($limit);
 													
 				$ninProductIds->getSelect()->order(new Zend_Db_Expr('RAND()'));
-			
+				Mage::getModel('cataloginventory/stock')->addInStockFilterToCollection($ninProductIds);
+
 				foreach ($ninProductIds as $item) {
 							$items[] = $item;
 				}

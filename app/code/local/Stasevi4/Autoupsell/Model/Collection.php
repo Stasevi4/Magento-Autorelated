@@ -8,11 +8,9 @@ class Stasevi4_Autoupsell_Model_Collection extends Mage_Core_Model_Abstract {
 		$products = $product->getUpSellProducts();
 
 		if (!$products) {
-	
 			$level  = 'level ASC';
 		
-			if ($product ) {
-				
+			if ($product ) {				
 				if (Mage::getStoreConfig('autoupsell/general/samecategory') == 1) {				
 					$level  = 'level DESC';		
 				}
@@ -22,9 +20,9 @@ class Stasevi4_Autoupsell_Model_Collection extends Mage_Core_Model_Abstract {
 					return false;		
 				}
 				$cats_collection = Mage::getModel('catalog/category')->getCollection()
-				->addAttributeToFilter('entity_id', $categoryIds)
-				->addFieldToFilter('store_id', Mage::app()->getStore()->getId())
-				->addAttributeToFilter('is_active', 1);
+					->addAttributeToFilter('entity_id', $categoryIds)
+					->addFieldToFilter('store_id', Mage::app()->getStore()->getId())
+					->addAttributeToFilter('is_active', 1);
 				$cats_collection->getSelect()->order($level )->limit(1);
 				$cats_collection->load();
 
@@ -35,6 +33,7 @@ class Stasevi4_Autoupsell_Model_Collection extends Mage_Core_Model_Abstract {
 				if (!empty($catid )) {
 					$category = Mage::getModel('catalog/category')->load($catid);			
 				}
+			
 			}
 
 			if (isset($category)) {
@@ -81,19 +80,21 @@ class Stasevi4_Autoupsell_Model_Collection extends Mage_Core_Model_Abstract {
 	public function getRelatedProducts($limit = false){
 		
 		$products = $this->getData('related_products');
-		
-		
+				
 		if (!$products) {
-			$product = Mage::registry('current_product');
-			
-			
+			$product = Mage::registry('current_product');						
 			if ($product) {
 
 				$categoryIds = $product->getCategoryIds();
+				if (empty($categoryIds)) {
+					return false;		
+				}
+
 				$cats_collection = Mage::getModel('catalog/category')->getCollection()
 				->addAttributeToFilter('entity_id', $categoryIds)
 				->addFieldToFilter('store_id', Mage::app()->getStore()->getId())
 				->addAttributeToFilter('is_active', 1);
+
 				$cats_collection->getSelect()->order('level DESC')->limit(1);
 				$cats_collection->load();
 
@@ -101,14 +102,13 @@ class Stasevi4_Autoupsell_Model_Collection extends Mage_Core_Model_Abstract {
 
 				}
 				
-			
+
 			}
 	
 			if (isset($category)) {
 				if ($limit === false) {
 					$limit = Mage::getStoreConfig('autoupsell/generalrelated/limit');
 				}
-
 				$products = Mage::getResourceModel('reports/product_collection')
 					->addAttributeToFilter('visibility', array(
 						Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH,
